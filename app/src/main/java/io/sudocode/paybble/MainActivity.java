@@ -1,9 +1,15 @@
 package io.sudocode.paybble;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.getpebble.android.kit.PebbleKit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -11,8 +17,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (PebbleKit.isWatchConnected(getApplicationContext())) {
+            registerPebbleConnectionReceivers();
+        } else {
+            Toast.makeText(this, "No Pebble connected.", Toast.LENGTH_LONG)
+                    .show();
+            finish();
+        }
     }
 
+    private void registerPebbleConnectionReceivers() {
+        PebbleKit.registerPebbleDisconnectedReceiver(getApplicationContext(),
+                new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Toast.makeText(MainActivity.this, "Pebble disconnected.", Toast.LENGTH_LONG)
+                        .show();
+            }
+        });
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
